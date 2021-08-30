@@ -17,3 +17,10 @@ class Author(models.Model):
 
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+
+
+class Lead(models.Model):
+    email = models.EmailField(max_length=100)
+    fullname = models.CharField(max_length=100)
+    phone = models.SmallIntegerField(max_length=15)
+    library = models.ForeignKey('book.Library', on_delete=models.CASCADE)
