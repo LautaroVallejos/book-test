@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    #Django apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,10 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    #Local apps
     'rest_framework',
     'rest_framework.authtoken',
 
-    'book'
+    'book',
+    'django_vuejs',
 ]
 
 MIDDLEWARE = [
