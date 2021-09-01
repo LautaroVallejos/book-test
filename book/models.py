@@ -20,6 +20,7 @@ class Author(models.Model):
 
 
 class Lead(models.Model):
+
     email = models.EmailField(max_length=100)
     fullname = models.CharField(max_length=100)
     phone = models.SmallIntegerField(max_length=15)
