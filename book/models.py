@@ -23,5 +23,8 @@ class Lead(models.Model):
 
     email = models.EmailField(max_length=100)
     fullname = models.CharField(max_length=100)
-    phone = models.SmallIntegerField(max_length=15)
+    phone = models.SmallIntegerField()
     library = models.ForeignKey('book.Library', on_delete=models.CASCADE)
+
+def __str__(self):
+    return self.name
