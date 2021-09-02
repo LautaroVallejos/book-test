@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     #Local apps
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt'
 
     'book',
 ]
@@ -130,3 +131,10 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Simple JWT configurations
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
