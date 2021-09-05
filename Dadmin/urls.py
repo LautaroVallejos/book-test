@@ -25,6 +25,5 @@ from book.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('/books', book_list_view)
     path('api/', include('book.api.urls')),
 ]
