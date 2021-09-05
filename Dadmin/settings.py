@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     #Local apps
     'rest_framework',
     'rest_framework.authtoken',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
 
     'book',
 ]
@@ -138,3 +138,6 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
+
+# [TO DO] Crear el admin user y esas shiiiiitsss
+ 
