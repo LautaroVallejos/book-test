@@ -139,5 +139,4 @@ REST_FRAMEWORK = {
     )
 }
 
-# [TO DO] Crear el admin user y esas shiiiiitsss
  
