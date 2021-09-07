@@ -13,3 +13,4 @@ def author_count(library):
 @register.filter(name='libraries_name')
 def libraries_name(libraries):
     return ', '.join([library.name for library in libraries])
+

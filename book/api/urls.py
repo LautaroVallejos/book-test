@@ -5,6 +5,8 @@ from book.views import *
 urlpatterns = [
     path('books/', book_list_view),
     path('authors/', author_list_view),
-    path('library/', library_list_view, name='library'),
-    path('apiviews/', hello_api_view)
+    path('library/', library_list_view, name='lib'),
+    path('leads/', lead_list_view),
+    path('apiviews/', hello_api_view),
+    path('libfilter/', library_filter)
 ]

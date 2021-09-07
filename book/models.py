@@ -23,8 +23,8 @@ class Lead(models.Model):
 
     email = models.EmailField(max_length=100, unique=True)
     fullname = models.CharField(max_length=100)
-    phone = models.SmallIntegerField()
-    library = models.ForeignKey('book.Library', on_delete=models.CASCADE)
+    phone = models.IntegerField()
+    library = models.ForeignKey('Library', on_delete=models.CASCADE)
 
 def __str__(self):
     return self.name

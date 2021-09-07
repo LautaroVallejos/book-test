@@ -1,10 +1,13 @@
+from django.db.models import fields, query
 from django.views.generic import ListView
 
-from .models import Book, Author, Library
+from .models import *
 
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+
+from .api.filters import *
 
 from book.api import serializers
 class BookListView(ListView):
@@ -29,7 +32,54 @@ class LibraryListView(ListView):
     model = Library
     context_object_name = 'libraries'
 
+class LibraryFilter(APIView):
+    model = Library
+    context_object_name = 'libraries'
 
+    serializer_class = serializers.LibrarySerializer
+
+    def get(self, request, format=None):
+        library = Library.objects.all()
+        library_serializer = self.serializer_class(fields)
+        return Response({library_serializer})
+
+# =================================================================
+#Lead endpoint, post method
+class LeadListView(APIView):
+
+    serializer_class = serializers.LeadSerializer
+    
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        model = Lead
+        context_object_name = 'leads'
+
+        if serializer.is_valid():
+            email = serializer.validated_data.get('email')
+            fullname = serializer.validated_data.get('fullname')
+            phone = serializer.validated_data.get('phone')
+            library = serializer.validated_data.get('library')
+            
+            return Response({
+                'email': email,
+                'fullname': fullname,
+                'phone': phone,
+                'library': library,
+            })
+        
+        else:
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    # def get_queryset(self):
+    #     qs = super(LeadListView, self).get_queryset()
+    #     qs.order_by('phone')
+    #     return qs
+
+
+#Ejemplo practico de una api view
 class HelloApiView(APIView):
 
     serializer_class = serializers.HelloSerializer
@@ -63,3 +113,5 @@ hello_api_view = HelloApiView.as_view()
 book_list_view = BookListView.as_view()
 author_list_view = AuthorListView.as_view()
 library_list_view = LibraryListView.as_view()
+lead_list_view = LeadListView.as_view()
+library_filter = LibraryFilter.as_view()
