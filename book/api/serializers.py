@@ -33,6 +33,3 @@ class LeadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lead
         fields = '__all__'
-
-class HelloSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=10)

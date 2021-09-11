@@ -1,15 +1,22 @@
+from warnings import filters
 from django.db.models import fields, query
+from django.http.response import JsonResponse
 from django.views.generic import ListView
+from rest_framework.serializers import Serializer 
 
+#Local Imports
 from .models import *
+from .api.filters import *
+from book.api import serializers
+from book.api.serializers import BookSerializer, AuthorSerializer
 
+#Rest Framework Imports
 from rest_framework import status
+from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
 
-from .api.filters import *
-
-from book.api import serializers
 class BookListView(ListView):
     paginate_by = 100
     model = Book
@@ -21,6 +28,20 @@ class BookListView(ListView):
         return qs
 
 
+# ==============================
+#Book filter by id
+class BookFilter(APIView):
+
+    serializer_class = serializers.BookSerializer
+
+    paginate_by = 10
+    model = Book
+    context_object_name = 'books'
+
+    def get_queryset(self, request):
+        qs = super(BookListView, self).get_queryset()
+        qs.filter('title')
+        
 class AuthorListView(ListView):
     paginate_by = 100
     model = Author
@@ -32,19 +53,21 @@ class LibraryListView(ListView):
     model = Library
     context_object_name = 'libraries'
 
-class LibraryFilter(APIView):
+#============================
+class LibraryFilter(ListView):
     model = Library
     context_object_name = 'libraries'
 
     serializer_class = serializers.LibrarySerializer
 
-    def get(self, request, format=None):
+    def get(self, request):
         library = Library.objects.all()
         library_serializer = self.serializer_class(fields)
-        return Response({library_serializer})
+        return Response(library_serializer)
+
 
 # =================================================================
-#Lead endpoint, post method
+#Lead endpoint, post method only
 class LeadListView(APIView):
 
     serializer_class = serializers.LeadSerializer
@@ -52,20 +75,24 @@ class LeadListView(APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         model = Lead
-        context_object_name = 'leads'
+        context_object_name = 'lead'
 
         if serializer.is_valid():
+            
+            serializer.save()
             email = serializer.validated_data.get('email')
             fullname = serializer.validated_data.get('fullname')
             phone = serializer.validated_data.get('phone')
             library = serializer.validated_data.get('library')
+            librarySerializer = serializers.Library
             
             return Response({
+                'message': "The lead was created succesfully",
                 'email': email,
                 'fullname': fullname,
                 'phone': phone,
-                'library': library,
-            })
+                'library': library.name,
+            }, status=status.HTTP_201_CREATED)
         
         else:
             return Response(
@@ -73,45 +100,24 @@ class LeadListView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-    # def get_queryset(self):
-    #     qs = super(LeadListView, self).get_queryset()
-    #     qs.order_by('phone')
-    #     return qs
+#================================================================
+#Probando Viewset
+class AuthorViewSet(viewsets.ModelViewSet):
+
+    def list(self, request):
+        queryset = Author.objects.all()
+        serilizer = AuthorSerializer(queryset, many=True)
+        return Response(serilizer.data)
 
 
-#Ejemplo practico de una api view
-class HelloApiView(APIView):
 
-    serializer_class = serializers.HelloSerializer
+#=====================================
+#Views Exports
+#Variable name`s 
 
-    def get(self, request, format=None):
-        """Retorna la lista de caracteristicas del api view"""
-        an_apiview = ['lorem ipstun', 
-        'lorem ipsum dolor sit amet, consectetur', 
-        'jajaxd', 
-        'estos son apiviews', 
-        'se mapean manualmente'
-        ]
-
-        return Response({'message': 'hello littel bitch', 'an_apiview': an_apiview})
-
-    def post(self, request):
-        """Crea mensaje"""
-        serializer = self.serializer_class(data=request.data)
-
-        if serializer.is_valid():
-            name = serializer.validated_data.get('name')
-            message = f'hello {name}'
-            return Response({'message': message})
-        else:
-            return Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-hello_api_view = HelloApiView.as_view()
 book_list_view = BookListView.as_view()
-author_list_view = AuthorListView.as_view()
+book_filter_id = BookFilter.as_view()
+author_list_view = AuthorViewSet.as_view({'get': 'list'})
 library_list_view = LibraryListView.as_view()
 lead_list_view = LeadListView.as_view()
 library_filter = LibraryFilter.as_view()

@@ -16,12 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 from book.api.urls import *
-from book.views import *
 
-"""Change the views part to a module in the directory"""
-# from rest_framework_simplejwt.views import book_list_view (
-#     TokenObtainPairView, TokenRefreshView
-# )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
