@@ -1,14 +1,11 @@
-from warnings import filters
-from django.db.models import fields, query
-from django.http.response import JsonResponse
+from django.db.models.query import QuerySet
 from django.views.generic import ListView
-from rest_framework.serializers import Serializer 
+from rest_framework import serializers
 
 #Local Imports
 from .models import *
-from .api.filters import *
-from book.api import serializers
-from book.api.serializers import BookSerializer, AuthorSerializer
+from book.serializers import *
+from .serializers import LeadSerializer, BookSerializer, LibrarySerializer, AuthorSerializer
 
 #Rest Framework Imports
 from rest_framework import status
@@ -17,6 +14,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
+#==============================
+# BookList
 class BookListView(ListView):
     paginate_by = 100
     model = Book
@@ -27,50 +26,26 @@ class BookListView(ListView):
         qs.order_by('title')
         return qs
 
-
-# ==============================
-#Book filter by id
-class BookFilter(APIView):
-
-    serializer_class = serializers.BookSerializer
-
-    paginate_by = 10
-    model = Book
-    context_object_name = 'books'
-
-    def get_queryset(self, request):
-        qs = super(BookListView, self).get_queryset()
-        qs.filter('title')
-        
+#==============================
+# Author List        
 class AuthorListView(ListView):
     paginate_by = 100
     model = Author
     context_object_name = 'authors'
 
-
+#==============================
+# Library List
 class LibraryListView(ListView):
     paginate_by = 10
     model = Library
     context_object_name = 'libraries'
-
-#============================
-class LibraryFilter(ListView):
-    model = Library
-    context_object_name = 'libraries'
-
-    serializer_class = serializers.LibrarySerializer
-
-    def get(self, request):
-        library = Library.objects.all()
-        library_serializer = self.serializer_class(fields)
-        return Response(library_serializer)
 
 
 # =================================================================
 #Lead endpoint, post method only
 class LeadListView(APIView):
 
-    serializer_class = serializers.LeadSerializer
+    serializer_class = LeadSerializer
     
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -84,7 +59,6 @@ class LeadListView(APIView):
             fullname = serializer.validated_data.get('fullname')
             phone = serializer.validated_data.get('phone')
             library = serializer.validated_data.get('library')
-            librarySerializer = serializers.Library
             
             return Response({
                 'message': "The lead was created succesfully",
@@ -101,13 +75,13 @@ class LeadListView(APIView):
             )
 
 #================================================================
-#Probando Viewset
+#Testing Viewset
 class AuthorViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = Author.objects.all()
-        serilizer = AuthorSerializer(queryset, many=True)
-        return Response(serilizer.data)
+        serializer = AuthorSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 
@@ -116,8 +90,6 @@ class AuthorViewSet(viewsets.ModelViewSet):
 #Variable name`s 
 
 book_list_view = BookListView.as_view()
-book_filter_id = BookFilter.as_view()
-author_list_view = AuthorViewSet.as_view({'get': 'list'})
+author_list_view = AuthorListView.as_view()
 library_list_view = LibraryListView.as_view()
 lead_list_view = LeadListView.as_view()
-library_filter = LibraryFilter.as_view()
