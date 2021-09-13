@@ -85,12 +85,12 @@ class LeadViewSet(viewsets.ModelViewSet):
 
 #================================================================
 #Testing Viewset
-class AuthorViewSet(viewsets.ModelViewSet):
+#class AuthorViewSet(viewsets.ModelViewSet):
 
-    def list(self, request):
-        queryset = Author.objects.all()
-        serializer = AuthorSerializer(queryset, many=True)
-        return Response(serializer.data)
+#    def list(self, request):
+#        queryset = Author.objects.all()
+#        serializer = AuthorSerializer(queryset, many=True)
+#        return Response(serializer.data)
 
 
 
