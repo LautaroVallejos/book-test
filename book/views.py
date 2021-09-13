@@ -28,10 +28,19 @@ class BookListView(ListView):
 
 #==============================
 # Author List        
-class AuthorListView(ListView):
-    paginate_by = 100
-    model = Author
-    context_object_name = 'authors'
+class AuthorViewSet(viewsets.ModelViewSet):
+
+    def list(self, request):
+        queryset = Author.objects.all()
+        serializer = AuthorSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    # Response(serializer_class.data)
+
+    # paginate_by = 100
+    # model = Author
+    # context_object_name = 'authors'
+
 
 #==============================
 # Library List
@@ -43,7 +52,7 @@ class LibraryListView(ListView):
 
 # =================================================================
 #Lead endpoint, post method only
-class LeadListView(APIView):
+class LeadViewSet(viewsets.ModelViewSet):
 
     serializer_class = LeadSerializer
     
@@ -90,6 +99,6 @@ class AuthorViewSet(viewsets.ModelViewSet):
 #Variable name`s 
 
 book_list_view = BookListView.as_view()
-author_list_view = AuthorListView.as_view()
+author_list_view = AuthorViewSet.as_view({'get': 'list'})
 library_list_view = LibraryListView.as_view()
-lead_list_view = LeadListView.as_view()
+lead_list_view = LeadViewSet.as_view({'post': 'post'})
