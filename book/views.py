@@ -83,17 +83,6 @@ class LeadViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-#================================================================
-#Testing Viewset
-# class AuthorViewSet(viewsets.ModelViewSet):
-
-#     def list(self, request):
-#         queryset = Author.objects.all()
-#         serializer = AuthorSerializer(queryset, many=True)
-#         return Response(serializer.data)
-
-
-
 #=====================================
 #Views Exports
 #Variable name`s 
