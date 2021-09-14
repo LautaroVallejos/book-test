@@ -1,6 +1,5 @@
 from django.db.models.query import QuerySet
 from django.views.generic import ListView
-from rest_framework import serializers
 
 #Local Imports
 from .models import *
@@ -8,9 +7,9 @@ from book.serializers import *
 from .serializers import LeadSerializer, BookSerializer, LibrarySerializer, AuthorSerializer
 
 #Rest Framework Imports
+from rest_framework import serializers
 from rest_framework import status
 from rest_framework import viewsets
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -27,15 +26,16 @@ class BookListView(ListView):
         return qs
 
 #==============================
-# Author List        
+# Author View Set        
 class AuthorViewSet(viewsets.ModelViewSet):
+
+    serializer_class = AuthorSerializer
 
     def list(self, request):
         queryset = Author.objects.all()
         serializer = AuthorSerializer(queryset, many=True)
-        return Response(serializer.data)
 
-    # Response(serializer_class.data)
+        return Response(serializer.data)
 
     # paginate_by = 100
     # model = Author
@@ -85,12 +85,12 @@ class LeadViewSet(viewsets.ModelViewSet):
 
 #================================================================
 #Testing Viewset
-class AuthorViewSet(viewsets.ModelViewSet):
+# class AuthorViewSet(viewsets.ModelViewSet):
 
-    def list(self, request):
-        queryset = Author.objects.all()
-        serializer = AuthorSerializer(queryset, many=True)
-        return Response(serializer.data)
+#     def list(self, request):
+#         queryset = Author.objects.all()
+#         serializer = AuthorSerializer(queryset, many=True)
+#         return Response(serializer.data)
 
 
 
