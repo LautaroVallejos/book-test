@@ -22,16 +22,13 @@ class BookViewSet(viewsets.ModelViewSet):
     context_object_name = 'books'
 
     serializer_class = BookSerializer
-    queryset = Book.objects.all()
-
-    # def get_queryset(self):
-    #     qs = super(BookViewSet, self).get_queryset()
-    #     qs.order_by('title')
-    #     return qs
+    #return lastest books
+    queryset = Book.objects.all()[9990:]
 
     def list(self, request):
         serializer = BookSerializer(self.queryset, many=True)
         return Response(serializer.data)
+
 
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -47,8 +44,14 @@ class BookViewSet(viewsets.ModelViewSet):
                 'message': 'The book was created and added succesfully',
                 'title': title,
                 'author': author.first_name + ' ' + author.last_name,
-                'libraries': libraries.name
+                'libraries': libraries
             }, status=status.HTTP_201_CREATED)
+
+        else:
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 
@@ -88,12 +91,43 @@ class AuthorViewSet(viewsets.ModelViewSet):
                 'first_name': first_name,
                 'last_name': last_name
             }, status=status.HTTP_201_CREATED)
+        
+        else:
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 
 #==============================
-# Library List
-class LibraryListView(ListView):
+# Library View Set
+class LibraryViewSet(viewsets.ModelViewSet):
+
+    serializer_class = LibrarySerializer
+    queryset = Library.objects.all()
+
+    def list(self, request):
+        serializer = LibrarySerializer(self.queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request):
+        serializer = self.serializer_class(data = request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            
+            name = serializer.validated_data.get('name')
+
+            return Response({
+                'message': 'The Library was created succesfully',
+                'name': name,
+            }, status=status.HTTP_201_CREATED)
+
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
     paginate_by = 10
     model = Library
     context_object_name = 'libraries'
@@ -104,8 +138,9 @@ class LibraryListView(ListView):
 class LeadViewSet(viewsets.ModelViewSet):
 
     serializer_class = LeadSerializer
+    queryset = Lead.objects.all()
     
-    def post(self, request):
+    def create(self, request):
         serializer = self.serializer_class(data=request.data)
         model = Lead
         context_object_name = 'lead'
@@ -136,7 +171,7 @@ class LeadViewSet(viewsets.ModelViewSet):
 #Views Exports
 #Variable name`s 
 
-book_list_view = BookViewSet.as_view([{'get': 'list'}, {'post': 'create'}])
-author_list_view = AuthorViewSet.as_view({'get': 'list'})
-library_list_view = LibraryListView.as_view()
-lead_list_view = LeadViewSet.as_view({'post': 'post'})
+book_view_set = BookViewSet.as_view({'get': 'list'})
+author_view_set = AuthorViewSet.as_view({'get': 'list'})
+library_view_set = LibraryViewSet.as_view({'get': 'list'})
+lead_view_set = LeadViewSet.as_view({'post': 'create'})

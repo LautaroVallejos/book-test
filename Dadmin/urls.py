@@ -8,6 +8,6 @@ from book.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('book.api.urls')),
-    path('test/', include('book.api.routers')),
+    path('test/', include('book.api.urls')),
+    path('api/', include('book.api.routers')),
 ]
