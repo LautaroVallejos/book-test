@@ -2,6 +2,8 @@ from django.db.models.query import QuerySet
 from django.views.generic import ListView
 from rest_framework.generics import get_object_or_404
 
+import copy
+
 #Local Imports
 from .models import *
 from book.serializers import *
@@ -16,14 +18,17 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 #==============================
 # BookList
+
+# Do request with curl, postman, etc
+# The front can`t render all database
+# But the request response correctly
 class BookViewSet(viewsets.ModelViewSet):
     paginate_by = 100
     model = Book
     context_object_name = 'books'
 
     serializer_class = BookSerializer
-    #return lastest books
-    queryset = Book.objects.all()[9990:]
+    queryset = Book.objects.all()
 
     def list(self, request):
         serializer = BookSerializer(self.queryset, many=True)
@@ -42,9 +47,7 @@ class BookViewSet(viewsets.ModelViewSet):
 
             return Response({
                 'message': 'The book was created and added succesfully',
-                'title': title,
-                'author': author.first_name + ' ' + author.last_name,
-                'libraries': libraries
+                'data': serializer.data
             }, status=status.HTTP_201_CREATED)
 
         else:
@@ -55,10 +58,24 @@ class BookViewSet(viewsets.ModelViewSet):
 
 
 
-    def retrieve(self, request, pk = 'title'):
+    def retrieve(self, request, pk=id):
     
         book = get_object_or_404(self.queryset, pk=pk)
         serializer = BookSerializer(book)
+        return Response(serializer.data)
+        
+
+#================================================================
+# Book Search Viewset
+class BookSearch(viewsets.ModelViewSet):
+    serializer_class = BookSerializer
+    queryset = Book.objects.all()
+
+    def list(self, request):
+        qs = copy.deepcopy(self.queryset)
+        qs = qs.filter(title__icontains = request.data.get('title'))
+        serializer = BookSerializer(qs)
+
         return Response(serializer.data)
         
 
@@ -171,7 +188,10 @@ class LeadViewSet(viewsets.ModelViewSet):
 #Views Exports
 #Variable name`s 
 
-book_view_set = BookViewSet.as_view({'get': 'list'})
+book_view_set = BookViewSet.as_view({
+    'get': 'list',
+    'post': 'create',
+    })
 author_view_set = AuthorViewSet.as_view({'get': 'list'})
 library_view_set = LibraryViewSet.as_view({'get': 'list'})
 lead_view_set = LeadViewSet.as_view({'post': 'create'})
