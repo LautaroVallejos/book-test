@@ -1,3 +1,4 @@
+from warnings import filters
 from django.db.models.query import QuerySet
 from django.views.generic import ListView
 from rest_framework.generics import get_object_or_404
@@ -15,6 +16,9 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.decorators import action
+from rest_framework import filters
+
 
 #==============================
 # BookList
@@ -22,6 +26,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 # Do request with curl, postman, etc
 # The front can`t render all database
 # But the request response correctly
+
+# You can filter by 'book/id' or by 'book/?search=[input text]'
 class BookViewSet(viewsets.ModelViewSet):
     paginate_by = 100
     model = Book
@@ -29,10 +35,8 @@ class BookViewSet(viewsets.ModelViewSet):
 
     serializer_class = BookSerializer
     queryset = Book.objects.all()
-
-    def list(self, request):
-        serializer = BookSerializer(self.queryset, many=True)
-        return Response(serializer.data)
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['title']
 
 
     def create(self, request):
@@ -57,28 +61,12 @@ class BookViewSet(viewsets.ModelViewSet):
             )
 
 
-
     def retrieve(self, request, pk=id):
     
         book = get_object_or_404(self.queryset, pk=pk)
         serializer = BookSerializer(book)
         return Response(serializer.data)
         
-
-#================================================================
-# Book Search Viewset
-class BookSearch(viewsets.ModelViewSet):
-    serializer_class = BookSerializer
-    queryset = Book.objects.all()
-
-    def list(self, request):
-        qs = copy.deepcopy(self.queryset)
-        qs = qs.filter(title__icontains = request.data.get('title'))
-        serializer = BookSerializer(qs)
-
-        return Response(serializer.data)
-        
-
 
 #==============================
 # Author View Set        
@@ -124,9 +112,33 @@ class LibraryViewSet(viewsets.ModelViewSet):
     serializer_class = LibrarySerializer
     queryset = Library.objects.all()
 
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['libraries']
+
+    # def get_serializer_class(self):
+    #     if self.action == 'book':
+    #         return BookSerializer
+    #     else: 
+    #         return LibrarySerializer
+
+    # @action(methods=['POST'], detail=True)
+    # def book(self, request, pk=None):
+    #     book = self.get_object()
+    #     serializer = BookSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.data['libraries']
+            
+    #         for library in libraries:
+    #             library = Book.objects.get(pk=Book)
+    #             return Response(library)
+
+
+       
+
     def list(self, request):
         serializer = LibrarySerializer(self.queryset, many=True)
         return Response(serializer.data)
+
 
     def create(self, request):
         serializer = self.serializer_class(data = request.data)
