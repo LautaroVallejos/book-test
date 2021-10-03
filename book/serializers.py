@@ -1,12 +1,13 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import *
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['url', 'username', 'email', 'groups']
+        fields = ['url', 'username', 'email']
 
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
@@ -33,3 +34,7 @@ class LeadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lead
         fields = '__all__'
+
+# Custom Auth Serializers
+class CustomTokenObtainPairViewSerializer(TokenObtainPairSerializer):
+    pass
