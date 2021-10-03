@@ -26,12 +26,6 @@ class Lead(models.Model):
     phone = models.IntegerField()
     library = models.ForeignKey('book.Library', on_delete=models.CASCADE)
 
-# class User(models.Model):
-
-#     username = models.CharField(max_length=100)
-#     email = models.EmailField(max_length=100)
-#     url = models.URLField()
-
 
 def __str__(self):
     return self.name
