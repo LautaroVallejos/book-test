@@ -1,23 +1,19 @@
-from warnings import filters
-from rest_framework.generics import get_object_or_404
+""" Views for book api test """
 
 #Local Imports
 from .models import *
-# from book.models import User
 from book.serializers import *
-from .serializers import LeadSerializer, BookSerializer, LibrarySerializer, AuthorSerializer, CustomTokenObtainPairViewSerializer, UserSerializer
+from .serializers import LeadSerializer, BookSerializer, LibrarySerializer, AuthorSerializer
 
 #Rest Framework Imports
-from django.contrib.auth import authenticate
-from rest_framework import status
-from rest_framework import viewsets
+from rest_framework import filters, status, viewsets
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
-from rest_framework import filters
-from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from rest_framework_simplejwt.tokens import RefreshToken
+from warnings import filters
+from rest_framework.generics import get_object_or_404
+
+
 #==============================
 # BookList
 
@@ -33,9 +29,8 @@ class BookViewSet(viewsets.ModelViewSet):
 
     serializer_class = BookSerializer
     queryset = Book.objects.all()
-    filter_backends = [filters.SearchFilter]
+    filters_backends = [filters.SearchFilter]
     search_fields = ['title']
-
 
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
