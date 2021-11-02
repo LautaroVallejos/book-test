@@ -111,31 +111,20 @@ class LibraryViewSet(viewsets.ModelViewSet):
     queryset = Library.objects.all()
 
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['libraries']
+    filterset_fields = ['books']
 
-    # def get_serializer_class(self):
-    #     if self.action == 'book':
-    #         return BookSerializer
-    #     else: 
-    #         return LibrarySerializer
+    @action(detail='True', methods=['get'], url_path='filter')
+    def filterLibrary(self, request, pk=id):
+        obj = self.get_object()
+        book = get_object_or_404(Book.libraries, pk=pk)
+        serializer = self.get_serializer(self.queryset, many=True)
+        
 
-    # @action(methods=['POST'], detail=True)
-    # def book(self, request, pk=None):
-    #     book = self.get_object()
-    #     serializer = BookSerializer(data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.data['libraries']
-            
-    #         for library in libraries:
-    #             library = Book.objects.get(pk=Book)
-    #             return Response(library)
-
-
-       
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def list(self, request):
         serializer = LibrarySerializer(self.queryset, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data.id)
 
 
     def create(self, request):
@@ -157,7 +146,7 @@ class LibraryViewSet(viewsets.ModelViewSet):
 
     paginate_by = 10
     model = Library
-    context_object_name = 'libraries'
+    # context_object_name = 'libraries'
 
 
 # =================================================================
