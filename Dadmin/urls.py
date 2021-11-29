@@ -13,6 +13,4 @@ urlpatterns = [
     path('api/', include('book.api.routers')),
     path('token/', TokenObtainPairView.as_view(), name='token'),
     path('token/refresh', TokenRefreshView.as_view(), name='token-refresh'),
-    path('login/', Login.as_view(), name='login'),
-    path('logout/', Logout.as_view({'post': 'post'}), name='logout')
 ]

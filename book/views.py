@@ -111,27 +111,7 @@ class LibraryViewSet(viewsets.ModelViewSet):
     queryset = Library.objects.all()
 
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['libraries']
-
-    # def get_serializer_class(self):
-    #     if self.action == 'book':
-    #         return BookSerializer
-    #     else: 
-    #         return LibrarySerializer
-
-    # @action(methods=['POST'], detail=True)
-    # def book(self, request, pk=None):
-    #     book = self.get_object()
-    #     serializer = BookSerializer(data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.data['libraries']
-            
-    #         for library in libraries:
-    #             library = Book.objects.get(pk=Book)
-    #             return Response(library)
-
-
-       
+    filterset_fields = ['id']
 
     def list(self, request):
         serializer = LibrarySerializer(self.queryset, many=True)
@@ -193,54 +173,6 @@ class LeadViewSet(viewsets.ModelViewSet):
                 serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-#=========================================
-#Authentication Views (with simple-jwt)
-
-class Login(TokenObtainPairView):
-    serializer_class: CustomTokenObtainPairViewSerializer
-
-    def post(self, request):
-        username= request.data.get('username', '')
-        password= request.data.get('password', '')
-        user = authenticate(
-            username=username,
-            password=password
-        )
-
-        if user:
-            login_serializer = self.serializer_class(data=request.data)
-
-            if login_serializer.is_valid():
-                user_serializer = UserSerializer(user)
-                return Response({
-                    'token': login_serializer.validated_data.get('access'),
-                    'refresh-token': login_serializer.validated_data.get('refresh'),
-                    'user': user_serializer.data,
-                    'message': 'Login succesful'
-                }, status=status.HTTP_200_OK)
-
-            else:
-                return Response({
-                    'error': 'username or password are not correct, please check and try again'
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-class Logout(viewsets.ViewSet):
-
-    def post(self, request):
-
-        user = User.Object.filter(id=request.data.get('user', ''))
-
-        if user.exists():
-            RefreshToken.for_user(user.first())
-            return Response({
-                'message': 'Logout Succesful'
-            }, status=status.HTTP_200_OK)
-
-        else:
-            return Response({
-                'errors': 'user doesn`t exist'
-            })
 
 
 #=====================================
