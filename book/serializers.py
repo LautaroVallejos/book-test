@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import *
 
 
@@ -35,6 +34,3 @@ class LeadSerializer(serializers.ModelSerializer):
         model = Lead
         fields = '__all__'
 
-# Custom Auth Serializers
-class CustomTokenObtainPairViewSerializer(TokenObtainPairSerializer):
-    pass

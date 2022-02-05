@@ -5,7 +5,7 @@ from rest_framework.generics import get_object_or_404
 from .models import *
 # from book.models import User
 from book.serializers import *
-from .serializers import LeadSerializer, BookSerializer, LibrarySerializer, AuthorSerializer, CustomTokenObtainPairViewSerializer, UserSerializer
+from .serializers import LeadSerializer, BookSerializer, LibrarySerializer, AuthorSerializer, UserSerializer
 
 #Rest Framework Imports
 from django.contrib.auth import authenticate
@@ -16,8 +16,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework import filters
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from rest_framework_simplejwt.tokens import RefreshToken
 #==============================
 # BookList
 
@@ -173,16 +171,3 @@ class LeadViewSet(viewsets.ModelViewSet):
                 serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-
-#=====================================
-#Views Exports
-#Variable name`s 
-
-book_view_set = BookViewSet.as_view({
-    'get': 'list',
-    'post': 'create',
-    })
-author_view_set = AuthorViewSet.as_view({'get': 'list'})
-library_view_set = LibraryViewSet.as_view({'get': 'list'})
-lead_view_set = LeadViewSet.as_view({'post': 'create'})
