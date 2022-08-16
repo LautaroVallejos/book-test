@@ -1,6 +1,4 @@
-from warnings import filters
 from rest_framework.generics import get_object_or_404
-
 #Local Imports
 from .models import *
 # from book.models import User
@@ -8,6 +6,8 @@ from book.serializers import *
 from .serializers import LeadSerializer, BookSerializer, LibrarySerializer, AuthorSerializer, UserSerializer
 
 #Rest Framework Imports
+import json
+from collections import OrderedDict
 from django.contrib.auth import authenticate
 from rest_framework import status
 from rest_framework import viewsets
@@ -16,24 +16,27 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework import filters
 from rest_framework.permissions import IsAuthenticated
-#==============================
-# BookList
 
-# Do request with curl, postman, etc
-# The front can`t render all database
-# But the request response correctly
+#==============================
+# BookViewSet
+
+# The books views return from a diferent way in this case, they are parsed to json before return it.
+# Else the page not response for the heavy quantity of objects and crash.
 
 # You can filter by 'book/[id]' or by 'book/?search=[input text]'
 class BookViewSet(viewsets.ModelViewSet):
-    paginate_by = 100
-    model = Book
-    context_object_name = 'books'
-
     serializer_class = BookSerializer
     queryset = Book.objects.all()
     filter_backends = [filters.SearchFilter]
     search_fields = ['title']
 
+    def list(self, request):
+        serializer = BookSerializer(self.queryset, many=True)
+        titleList = serializer.data
+        # parse all objects to json and return it
+        response = json.dumps(titleList)
+
+        return Response(response)
 
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -56,7 +59,6 @@ class BookViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-
     def retrieve(self, request, pk=id):
     
         book = get_object_or_404(self.queryset, pk=pk)
@@ -71,15 +73,11 @@ class AuthorViewSet(viewsets.ModelViewSet):
     serializer_class = AuthorSerializer
     queryset = Author.objects.all()
 
-    paginate_by = 100
-    model = Author
-    context_object_name = 'authors'
-
     def list(self, request):
         serializer = AuthorSerializer(self.queryset, many=True)
         return Response(serializer.data)
 
-    def create(self, request,):
+    def create(self, request):
         serializer = self.serializer_class(data = request.data)
 
         if serializer.is_valid():
@@ -105,16 +103,15 @@ class AuthorViewSet(viewsets.ModelViewSet):
 # Library View Set
 class LibraryViewSet(viewsets.ModelViewSet):
 
-    serializer_class = LibrarySerializer
     queryset = Library.objects.all()
+    serializer_class = LibrarySerializer
 
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['id']
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name']
 
     def list(self, request):
         serializer = LibrarySerializer(self.queryset, many=True)
         return Response(serializer.data)
-
 
     def create(self, request):
         serializer = self.serializer_class(data = request.data)
@@ -131,11 +128,6 @@ class LibraryViewSet(viewsets.ModelViewSet):
 
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-    paginate_by = 10
-    model = Library
-    context_object_name = 'libraries'
 
 
 # =================================================================
