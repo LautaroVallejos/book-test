@@ -1,0 +1,4 @@
+# Ignore generated files
+**/*.pyc
+./Dadmin/__pycache__/*.pyc
+./book/__pycache__/*.pyc
